@@ -9,6 +9,10 @@ namespace app.Models
         [Key]
         public int tid { get; set; }
 
+        [Required]
+        [StringLength(100)]
+        public string name { get; set; }
+
         [Column(TypeName="Money")]
         public decimal price { get; set; }
         

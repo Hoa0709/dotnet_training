@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using app.Models;
-using app.Interfaces;
-using System.Collections;
+using app.Repository;
 
 namespace app.Controllers
 {
@@ -13,26 +11,18 @@ namespace app.Controllers
         
         private readonly IPrograms _IProgram;
         private readonly ILocations _ILocation;
-        public ProgramController(IPrograms IProgram,ILocations ILocation)
+        private readonly IArtists _IArtist;
+        public ProgramController(IPrograms IProgram,ILocations ILocation,IArtists IArtist)
         {
             _IProgram = IProgram;
             _ILocation = ILocation;
+            _IArtist = IArtist;
         }
         //Get List Program
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            var ps = await Task.FromResult(_IProgram.GetListPrograms());
-            var m = new ArrayList();
-            foreach (var item in ps)
-            {
-                m.Add(new{
-                    id_chuongtrinh = item.pid,
-                    chuongtrinh_name = item.name,
-                    pathimage_list = item.pathimage_list
-                });
-            }
-            return new JsonResult(m);
+            return new JsonResult(await Task.FromResult(_IProgram.GetListPrograms()));
         }
         //Get Item Program
         [HttpGet("{id}")]
@@ -51,7 +41,7 @@ namespace app.Controllers
                     chuongtrinh_name = ps.name,
                     chuongtrinh_content = ps.content,
                     type_inoff = ps.type_inoff,
-                    price = 20,
+                    price = ps.price,
                     typeprogram = ps.type_program,
                     arrange = 3,
                     detail_list = new{
@@ -69,29 +59,29 @@ namespace app.Controllers
             return new JsonResult(new{data = "empty"});
         }
         [HttpPost]
-        public IActionResult Post([FromForm] ProgramInfo program)
+        public IActionResult Post([FromBody] ProgramDto program)
         {
-            _IProgram.AddProgram(program);
-            return Ok();
+            return (_IProgram.AddProgram(program))?Ok(new Response { Status = "Success", Message = "Program created successfully!" }):BadRequest();
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id,[FromForm] ProgramInfo program)
+        public IActionResult Put(int id,[FromBody] ProgramDto program)
         {
             if (_IProgram.CheckProgram(id))
             {
-                program.pid = id;
-                _IProgram.UpdateProgram(program);
-                return Ok();
+                return (_IProgram.UpdateProgram(id,program))?Ok(new Response { Status = "Success", Message = "Program updated successfully!" }):Ok(new Response { Status = "Success", Message = "Program updated fail!" });
             }
-            else return BadRequest();
-            
+            else return BadRequest();         
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            return new JsonResult(new{result = (_IProgram.DeleteProgram(id))?"ok":"error"});
+            if (_IProgram.CheckProgram(id))
+            {
+                return (_IProgram.DeleteProgram(id))?Ok(new Response { Status = "Success", Message = "Program updated successfully!" }):Ok(new Response { Status = "Success", Message = "Program updated fail!" });
+            }
+            else return BadRequest();
         }
 
     }

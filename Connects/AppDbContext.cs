@@ -23,5 +23,6 @@ namespace app.Connects
         public DbSet<Ticket> tickets {set; get;}
         public DbSet<Union> unions {set; get;}
         public DbSet<Group> groups {set; get;}
+        public DbSet<Artist> artists {set; get;}
     }
 }

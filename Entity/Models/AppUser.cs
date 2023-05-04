@@ -9,10 +9,9 @@ namespace app.Models
         [Column(TypeName = "nvarchar")]
         [StringLength(100)]
         public string FullName { get; set; }
-        [PersonalData]
 
         public DateTime Birthday { get; set; }
-        
+
         [Column(TypeName = "nvarchar")]
         [StringLength(100)]
         public string IdentityNumber { get; set; }

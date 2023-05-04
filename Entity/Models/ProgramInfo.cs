@@ -18,6 +18,9 @@ namespace app.Models
 
         public int type_inoff { get; set; }
         public int type_program { get; set; }
+        
+        [Column(TypeName="Money")]
+        public decimal price { get; set; }
         public string md5 { get; set; }
 
         [Column(TypeName = "ntext")]

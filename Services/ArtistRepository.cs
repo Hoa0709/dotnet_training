@@ -38,7 +38,7 @@ namespace app.Repository
 
         public bool CheckArtist(int id)
         {
-            return _context.artists.Any(e => e.aid == id);
+            return _context.artists.Any(e => e.Id == id);
         }
 
         public bool DeleteArtist(int id)
@@ -46,7 +46,7 @@ namespace app.Repository
             try
             {
                 Artist n = _context.artists
-                                    .Where(x => x.aid == id)
+                                    .Where(x => x.Id == id)
                                     .FirstOrDefault();
                 if (n != null)
                 {
@@ -80,7 +80,7 @@ namespace app.Repository
             try
             {
                 Artist n = _context.artists
-                                    .Where(x => x.aid == id)
+                                    .Where(x => x.Id == id)
                                     .FirstOrDefault();
                 if (n != null)
                 {
@@ -102,11 +102,11 @@ namespace app.Repository
             try
             {
                 Artist n = _context.artists
-                                    .Where(x => x.aid == id)
+                                    .Where(x => x.Id == id)
                                     .FirstOrDefault();
                 if (n != null)
                 {
-                    return n.name;
+                    return n.Name;
                 }
                 else
                 {
@@ -123,7 +123,7 @@ namespace app.Repository
         {
             try
             {
-                if(id != l.aid) return false;
+                if(id != l.Id) return false;
                 else{
                     _context.Entry(l).State = EntityState.Modified;
                     _context.SaveChanges();

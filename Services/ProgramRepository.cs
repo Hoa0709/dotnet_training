@@ -1,4 +1,3 @@
-using System.Text;
 using app.Connects;
 using app.Models;
 using AutoMapper;
@@ -8,12 +7,13 @@ namespace app.Repository
 {
     public interface IPrograms
     {
-        public List<ProgramListViewDto> GetListPrograms();
-        public ProgramInfo GetProgramDetails(int id);
-        public Boolean AddProgram(ProgramDto pr);
-        public Boolean UpdateProgram(int id,ProgramDto pr);
-        public Boolean DeleteProgram(int id);
-        public Boolean CheckProgram(int id);
+        public Task<List<ProgramListViewDto>> GetListProgramsAsync();
+        public Task<ProgramInfo> GetProgramDetailsAsync(int id);
+        public Task<Boolean> AddProgramAsync(ProgramDto pr);
+        public Task<Boolean> UpdateProgramAsync(int id,ProgramInfo pr);
+        public Task<Boolean> DeleteProgramAsync(int id);
+        public Task<Boolean> CheckProgramAsync(int id);
+        public Task<Boolean> CheckTypeProgramAsync(int id);
     }
 
     public class ProgramRepository : IPrograms
@@ -25,121 +25,85 @@ namespace app.Repository
             _context = context;
             _mapper = mapper;
         }
-        //string random
-        private static Random random = new Random();
-        private static string RandomString(int length)
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
 
-        private string ComputeHash()
-        {
-            using (var md5 = System.Security.Cryptography.MD5.Create())
-            {
-                var data = md5.ComputeHash(Encoding.UTF8.GetBytes(RandomString(30)));
-                var sb = new StringBuilder();
-                foreach (var c in data) {
-                    sb.Append(c.ToString("x2"));
-                }
-                return sb.ToString();
-            }
-        }
-
-        public List<ProgramListViewDto> GetListPrograms()
+        public async Task<List<ProgramListViewDto>> GetListProgramsAsync()
         {
             try
             {
-                var ls = _context.programs
-                                        .Select(x => new { x.pid, x.name, x.pathimage_list })
-                                        .ToList();
+                var ls = await _context.programs
+                                .Select(x => new { x.Id, x.Name, x.Pathimage_list })
+                                .ToListAsync();
                 List<ProgramListViewDto> listview = new List<ProgramListViewDto>();
                 foreach (var item in ls)
                 {
-                    listview.Add(new ProgramListViewDto(){pid = item.pid, name = item.name, pathimage_list = item.pathimage_list});
+                    listview.Add(new ProgramListViewDto(){Id = item.Id, Name = item.Name, Pathimage_list = item.Pathimage_list});
                 }
                 return listview;
             }
             catch
             {
-                throw;
+                throw new Exception("Error! When Get Events List");
             }
         }
 
-        public ProgramInfo GetProgramDetails(int id)
+        public async Task<ProgramInfo> GetProgramDetailsAsync(int id)
         {
             try
             {
-                ProgramInfo pr = _context.programs
-                                    .Where(x => x.pid == id)
-                                    .FirstOrDefault();
-                return pr;
+                return await _context.programs
+                        .Where(x => x.Id == id)
+                        .FirstOrDefaultAsync();
             }
             catch
             {
-                throw;
+                throw new Exception("Error! When Get Event");
             }
         }
 
-        public Boolean AddProgram(ProgramDto pr)
+        public async Task<Boolean> AddProgramAsync(ProgramDto pr)
         {
             try
             {
                 ProgramInfo addpr = _mapper.Map<ProgramInfo>(pr);
-                addpr.create_at = DateTime.Now;
-                addpr.md5 = ComputeHash();
-                _context.programs.Add(addpr);
-                _context.SaveChanges();
+                addpr.Create_at = DateTime.Now;
+                await _context.programs.AddAsync(addpr);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch
             {
-                throw;
+                throw new Exception("Error! When Add Event");
             }
         }
 
-        public Boolean UpdateProgram(int id,ProgramDto pr)
+        public async Task<Boolean> UpdateProgramAsync(int id,ProgramInfo pr)
         {
             try
-            {
-                ProgramInfo p = _context.programs
-                                    .Where(x => x.pid == id)
-                                    .FirstOrDefault();            
-                if (p!=null){
-                    p.name = pr.name;
-                    p.content = pr.content;
-                    p.type_inoff = pr.type_inoff;
-                    p.type_program = pr.type_program;
-                    p.price = pr.price;
-                    p.pathimage_list = pr.pathimage_list;
-                    p.held_on = pr.held_on;
-                    p.l_id = pr.l_id;
-                    p.g_id = pr.g_id;
-                    p.u_id = pr.u_id;
-                    _context.Entry(p).State = EntityState.Modified;
-                    _context.SaveChanges();
+            {   if (id == pr.Id)
+                {
+                    _context.Entry(pr).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
                     return true;
                 }
-                else return false;
+                return false;
             }
             catch
             {
-                throw;
+                throw new Exception("Error! When Update Event");
             }
         }
 
-        public Boolean DeleteProgram(int id)
+        public async Task<Boolean> DeleteProgramAsync(int id)
         {
             try
             {
-                ProgramInfo pr = _context.programs
-                                    .Where(x => x.pid == id)
-                                    .FirstOrDefault();
+                ProgramInfo pr = await _context.programs
+                                    .Where(x => x.Id == id)
+                                    .FirstOrDefaultAsync();
                 if (pr != null)
                 {
                     _context.programs.Remove(pr);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return true;
                 }
                 else
@@ -147,13 +111,32 @@ namespace app.Repository
                 }
             catch
             {
-               throw;
+               throw new Exception("Error! When Delete Event");
             }
         }
 
-        public Boolean CheckProgram(int id)
+        public async Task<Boolean> CheckProgramAsync(int id)
         {
-            return _context.programs.Any(e => e.pid == id);
+            try
+            {
+                return await _context.programs.AnyAsync(e => e.Id == id);
+            }
+            catch
+            {
+               throw new Exception("Error! When Check Event");
+            }
+        }
+
+        public async Task<bool> CheckTypeProgramAsync(int id)
+        {
+            try
+            {
+                return await _context.programs.AnyAsync(e => e.Id == id && e.Type_inoff == 2);
+            }
+            catch
+            {
+               throw new Exception("Error! When Check Event");
+            }
         }
     }
 }

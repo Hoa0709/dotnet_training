@@ -7,15 +7,19 @@ namespace app.Models
     public class Artist {
 
         [Key]
-        public int aid { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [StringLength(100)]
-        public string name { get; set; }
+        public string Name { get; set; }
         
         [Column(TypeName="ntext")] 
-        public string decription { get; set; }
+        public string Decription { get; set; }
+
         [Column(TypeName="ntext")] 
-        public string pathimage { get; set; }
+        public string Pathimage { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime CreatAt { get; set; }
     }
 }

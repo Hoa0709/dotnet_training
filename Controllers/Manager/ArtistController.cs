@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using app.Models;
 using app.Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace app.Controllers
 {
-    [Route("Artist")]
+    [Authorize(Roles = "manager")]
+    [Route("Artists-Manager")]
+    [Route("Manager/Artists")]
     [ApiController]
     public class ArtistController : ControllerBase
     {

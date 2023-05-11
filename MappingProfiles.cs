@@ -9,8 +9,12 @@ namespace app.Map
         {
             CreateMap<ProgramInfo, ProgramListViewDto>();
             CreateMap<ProgramDto, ProgramInfo>();
-            //         .ForMember(c => c.,
-            //             opt => opt.MapFrom(x => string.Join(' ', x., x.)));
+            CreateMap<BookTicketDto, BookTicket>();
+            CreateMap<TicketDto, Ticket>();
+            CreateMap<Ticket, TicketDetailDto>();
+            // CreateMap<BookTicket, BookTicketDto>()
+            //         .ForMember(c => c.FullName,
+            //             opt => opt.MapFrom(x => string.Join(' ', x.LastName, x.FisrtName)));
         }
     }
 }

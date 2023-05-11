@@ -27,7 +27,10 @@ var builder = WebApplication.CreateBuilder(args);
     Services.AddTransient<ILocations, LocationRepository>();
     Services.AddTransient<INews, NewsRepository>();
     Services.AddTransient<IArtists, ArtistRepository>();
-    //Services.AddSingleton<IAccount,AccountRepository>();
+    Services.AddTransient<ITicket, TicketRepository>();
+    Services.AddTransient<IBookTicket,BookTicketRepository>();
+    Services.AddTransient<IAccount,AccountRepository>();
+    Services.AddTransient<IManagerAccount,ManagerAccountRepository>();
 
     Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     Services.AddAuthentication(options =>
@@ -68,7 +71,9 @@ var app = builder.Build();
     app.UseMiddleware<ErrorHandlerMiddleware>();
     app.UseAuthentication();
     app.UseAuthorization();
-
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
     app.MapControllers();
 }
 

@@ -7,27 +7,24 @@ namespace app.Models
     public class Location {
 
         [Key]
-        public int lid { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [StringLength(100)]
-        public string title { get; set; }
+        public string Title { get; set; }
         
-        public string summary { get; set; }
+        public string Summary { get; set; }
 
         [Column(TypeName="ntext")] 
-        public string content { get; set; }
+        public string Content { get; set; }
 
-        public string pathimage { get; set; }
+        public string Pathimage { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime postdate { get; set; }
-
-        [StringLength(100)]
-        public string author { get; set; }
+        public DateTime CreatAt { get; set; }
         
-        public float latitude { get; set; }
-        public float longtitude { get; set; }
+        public float Latitude { get; set; }
+        public float Longtitude { get; set; }
 
     }
 }

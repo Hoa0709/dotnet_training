@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using app.Models;
 
@@ -24,14 +25,17 @@ namespace app.Repository
             }
         }
 
-        private static Task HandleErrorAsync(HttpContext context, Exception exception)
+        private static async Task HandleErrorAsync(HttpContext context, Exception exception)
         {
-            var response = new Response{Status = "Fail", Message = exception.Message };
-            var payload = JsonSerializer.Serialize(response);
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = 400;
 
-            return context.Response.WriteAsync(payload);
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync(new ErrorDetails()
+            {
+                Status = "Failure",
+                Message = exception.Message
+            }.ToString());
         }
     }
 }

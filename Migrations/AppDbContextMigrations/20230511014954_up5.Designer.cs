@@ -12,8 +12,8 @@ using app.Connects;
 namespace app.Migrations.AppDbContextMigrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230503014010_Update1")]
-    partial class Update1
+    [Migration("20230511014954_up5")]
+    partial class up5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,85 +27,100 @@ namespace app.Migrations.AppDbContextMigrations
 
             modelBuilder.Entity("app.Models.Artist", b =>
                 {
-                    b.Property<int>("aid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("aid"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("decription")
+                    b.Property<DateTime>("CreatAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Decription")
                         .HasColumnType("ntext");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("pathimage")
+                    b.Property<string>("Pathimage")
                         .HasColumnType("ntext");
 
-                    b.HasKey("aid");
+                    b.HasKey("Id");
 
                     b.ToTable("Artists");
                 });
 
-            modelBuilder.Entity("app.Models.Group", b =>
+            modelBuilder.Entity("app.Models.BookTicket", b =>
                 {
-                    b.Property<int>("gid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("gid"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("decription")
-                        .HasColumnType("ntext");
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("gid");
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Groups");
+                    b.Property<string>("IdentityNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumberOfTickets")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("TakeTicket")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BookTickets");
                 });
 
             modelBuilder.Entity("app.Models.Location", b =>
                 {
-                    b.Property<int>("lid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("lid"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("author")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("content")
+                    b.Property<string>("Content")
                         .HasColumnType("ntext");
 
-                    b.Property<float>("latitude")
-                        .HasColumnType("real");
-
-                    b.Property<float>("longtitude")
-                        .HasColumnType("real");
-
-                    b.Property<string>("pathimage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("postdate")
+                    b.Property<DateTime>("CreatAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("summary")
+                    b.Property<float>("Latitude")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Longtitude")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Pathimage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("title")
+                    b.Property<string>("Summary")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("lid");
+                    b.HasKey("Id");
 
                     b.ToTable("Locations");
                 });
@@ -143,51 +158,39 @@ namespace app.Migrations.AppDbContextMigrations
 
             modelBuilder.Entity("app.Models.ProgramInfo", b =>
                 {
-                    b.Property<int>("pid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pid"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("content")
+                    b.Property<int>("ArtistId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
                         .HasColumnType("ntext");
 
-                    b.Property<DateTime>("create_at")
+                    b.Property<DateTime>("Create_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("g_id")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("held_on")
+                    b.Property<DateTime>("Held_on")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("l_id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("md5")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("pathimage_list")
+                    b.Property<string>("Pathimage_list")
                         .HasColumnType("ntext");
 
-                    b.Property<decimal>("price")
-                        .HasColumnType("Money");
-
-                    b.Property<int>("type_inoff")
+                    b.Property<int>("Type_inoff")
                         .HasColumnType("int");
 
-                    b.Property<int>("type_program")
+                    b.Property<int>("Type_program")
                         .HasColumnType("int");
 
-                    b.Property<int>("u_id")
-                        .HasColumnType("int");
-
-                    b.HasKey("pid");
+                    b.HasKey("Id");
 
                     b.ToTable("Programs");
                 });
@@ -215,50 +218,30 @@ namespace app.Migrations.AppDbContextMigrations
 
             modelBuilder.Entity("app.Models.Ticket", b =>
                 {
-                    b.Property<int>("tid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("tid"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("inventory")
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Inventory")
                         .HasColumnType("int");
 
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("price")
+                    b.Property<decimal>("Price")
                         .HasColumnType("Money");
 
-                    b.Property<int>("quantity")
+                    b.Property<int>("ProgramId")
                         .HasColumnType("int");
 
-                    b.HasKey("tid");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Tickets");
-                });
-
-            modelBuilder.Entity("app.Models.Union", b =>
-                {
-                    b.Property<int>("uid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("uid"));
-
-                    b.Property<string>("decription")
-                        .HasColumnType("ntext");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("uid");
-
-                    b.ToTable("Unions");
                 });
 #pragma warning restore 612, 618
         }

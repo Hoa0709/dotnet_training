@@ -38,7 +38,7 @@ namespace app.Repository
 
         public bool CheckLocation(int id)
         {
-            return _context.locations.Any(e => e.lid == id);
+            return _context.locations.Any(e => e.Id == id);
         }
 
         public bool DeleteLocation(int id)
@@ -46,7 +46,7 @@ namespace app.Repository
             try
             {
                 Location n = _context.locations
-                                    .Where(x => x.lid == id)
+                                    .Where(x => x.Id == id)
                                     .FirstOrDefault();
                 if (n != null)
                 {
@@ -80,7 +80,7 @@ namespace app.Repository
             try
             {
                 Location n = _context.locations
-                                    .Where(x => x.lid == id)
+                                    .Where(x => x.Id == id)
                                     .FirstOrDefault();
                 return n;
             }
@@ -95,11 +95,11 @@ namespace app.Repository
             try
             {
                 Location n = _context.locations
-                                    .Where(x => x.lid == id)
+                                    .Where(x => x.Id == id)
                                     .FirstOrDefault();
                 if (n != null)
                 {
-                    return n.title;
+                    return n.Title;
                 }
                 else
                 {
@@ -116,7 +116,7 @@ namespace app.Repository
         {
             try
             {
-                if(id != l.lid) return false;
+                if(id != l.Id) return false;
                 else{
                     _context.Entry(l).State = EntityState.Modified;
                     _context.SaveChanges();

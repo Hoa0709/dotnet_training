@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using app.Models;
 using app.Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace app.Controllers
 {
-    [Route("Location")]
+    [Authorize(Roles = "manager")]
+    [Route("Locations-Manager")]
+    [Route("Manager/Locations")]
     [ApiController]
     public class LocationController : ControllerBase
     {

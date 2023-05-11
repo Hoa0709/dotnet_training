@@ -7,33 +7,27 @@ namespace app.Models
     public class ProgramInfo{
 
         [Key]
-        public int pid { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [StringLength(100)]
-        public string name { get; set; }
+        public string Name { get; set; }
 
         [Column(TypeName = "ntext")]
-        public string content { get; set; }
+        public string Content { get; set; }
 
-        public int type_inoff { get; set; }
-        public int type_program { get; set; }
-        
-        [Column(TypeName="Money")]
-        public decimal price { get; set; }
-        public string md5 { get; set; }
+        public int Type_inoff { get; set; }
+        public int Type_program { get; set; }
 
         [Column(TypeName = "ntext")]
-        public string pathimage_list { get; set; }
+        public string Pathimage_list { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime create_at { get; set; }
+        public DateTime Create_at { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime held_on { get; set; }
+        public DateTime Held_on { get; set; }
 
-        public int l_id { set; get; }
-        public int g_id { set; get; }
-        public int u_id { set; get; }
+        public int ArtistId { set; get; }
     }
 }

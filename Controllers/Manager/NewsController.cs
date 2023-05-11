@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using app.Models;
 using app.Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace app.Controllers
 {
-    [Route("News")]
+    [Authorize(Roles = "manager")]
+    [Route("News-Manager")]
+    [Route("Manager/News")]
     [ApiController]
     public class NewsController : ControllerBase
     {

@@ -6,17 +6,13 @@ namespace app.Models
     [Table("Tickets")]
     public class Ticket {
 
-        [Key]
-        public int tid { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string name { get; set; }
-
-        [Column(TypeName="Money")]
-        public decimal price { get; set; }
+        public int Id {set; get;}
+        public int ProgramId {set; get;}
         
-        public int quantity { get; set; }
-        public int inventory { get; set; }
+        [Column(TypeName="Money")]
+        public decimal Price { get; set; }
+        public int Quantity { get; set; }
+        public int Inventory { get; set; }
+        public string Code { get;set;}
     }
 }

@@ -44,6 +44,24 @@ namespace app.Controllers
             }
             return NotFound(new Response { Status = "Fail", Message = "Not Found Order Ticket" });
         }
+        [HttpGet("GetTicket/{id}")]
+        public async Task<ActionResult> GetTicket(int id)
+        {
+            if (await _ticket.CheckTicketAsync(id))
+            {
+                return Ok(await _ticket.GetListTakeTicketAsync(id, true));
+            }
+            return NotFound(new Response { Status = "Fail", Message = "Not Found Order Ticket" });
+        }
+        [HttpGet("NoGetTicket/{id}")]
+        public async Task<ActionResult> NoGetTicket(int id)
+        {
+            if (await _ticket.CheckTicketAsync(id))
+            {
+                return Ok(await _ticket.GetListTakeTicketAsync(id, false));
+            }
+            return NotFound(new Response { Status = "Fail", Message = "Not Found Order Ticket" });
+        }
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] TicketDto Ticket)
         {

@@ -10,9 +10,8 @@ namespace app.Repository
 {
     public interface IManagerAccount
     {
-        Task<String> ResetPassWordAsync(string UserId);
         Task<IdentityRole> CheckRoleAsync(string UserId);
-        Task<List<UserRolesViewModel>> GetListUserInRole(Roles? role);
+        Task<List<UserRolesViewModel>> GetListUser();
     }
     public class ManagerAccountRepository : IManagerAccount
     {
@@ -34,7 +33,7 @@ namespace app.Repository
         {
             return new List<string>(await userManager.GetRolesAsync(user));
         }
-        public async Task<List<UserRolesViewModel>> GetListUserInRole(Roles? role)
+        public async Task<List<UserRolesViewModel>> GetListUser()
         {
             try
             {
@@ -42,8 +41,6 @@ namespace app.Repository
                 var userRolesViewModel = new List<UserRolesViewModel>();
                 foreach (var user in users)
                 {
-                    var r = await GetUserRoles(user);
-                    if(r == null) continue;
                     var thisViewModel = new UserRolesViewModel();
                     thisViewModel.UserId = user.Id;
                     thisViewModel.UserName = user.UserName;
@@ -54,18 +51,12 @@ namespace app.Repository
                     thisViewModel.Roles = await GetUserRoles(user);
                     userRolesViewModel.Add(thisViewModel);
                 }
-                return userRolesViewModel;   
+                return userRolesViewModel;
             }
             catch
             {
                 throw new Exception("Error when get list user!");
             }
-        }
-
-
-        public Task<string> ResetPassWordAsync(string UserId)
-        {
-            throw new NotImplementedException();
         }
     }
 }

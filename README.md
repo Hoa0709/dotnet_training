@@ -20,6 +20,6 @@ dotnet ef migrations remove
 git branch (new-branch)
 git checkout (new-branch)
 git add .
-git commit -m "Eden added"
-git push origin
+git commit -m "commit"
+git push origin (new-branch)
 

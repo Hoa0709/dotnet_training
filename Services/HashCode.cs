@@ -5,7 +5,7 @@ namespace app.Repository
 {
     public class HashCode{
         private static Random random = new Random();
-        private static string RandomString(int length)
+        public string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
@@ -40,6 +40,17 @@ namespace app.Repository
                 return builder.ToString();  
             }  
         } 
+        public string EncodeBase64(string value)
+        {
+            var valueBytes = Encoding.UTF8.GetBytes(value);
+            return Convert.ToBase64String(valueBytes);
+        }
+
+        public string DecodeBase64(string value)
+        {
+            var valueBytes = System.Convert.FromBase64String(value);
+            return Encoding.UTF8.GetString(valueBytes);
+        }
         
     }
 }

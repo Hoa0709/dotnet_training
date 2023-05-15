@@ -12,56 +12,56 @@ namespace app.Controllers
     public class ArtistController : ControllerBase
     {
         
-        private readonly IArtists _IArtist;
-        public ArtistController(IArtists IArtist)
+        private readonly IArtists _artist;
+        public ArtistController(IArtists artist)
         {
-            _IArtist = IArtist;
+            _artist = artist;
         }
         //Get List News
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            return new JsonResult(await Task.FromResult(_IArtist.GetListArtist()));
+            return Ok(await _artist.GetListArtistAsync());
         }
         //Get Item Program
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            if (await Task.FromResult(_IArtist.CheckArtist(id)))
+            if (await _artist.CheckArtistAsync(id))
             {
-                var ps = await Task.FromResult(_IArtist.GetArtistDetails(id));
-                if (ps != null)
-                {
-                    return Ok(ps);
-                }
+                return Ok(await _artist.GetArtistDetailsAsync(id));
             }
-            return NotFound();
+            return NotFound(new Response { Status = "Fail", Message = "Not Found Artist" });
         }
         [HttpPost]
-        public IActionResult Post([FromBody] Artist artist)
+        public async Task<ActionResult> Post([FromBody] ArtistDto artist)
         {
-            return (_IArtist.AddArtist(artist))?Ok(new Response { Status = "Success", Message = "Artist created successfully!" }):BadRequest();
+            return (await _artist.AddArtistAsync(artist))?Ok(new Response { Status = "Success", Message = "Artist created successfully!" }):BadRequest(new Response { Status = "Fail", Message = "Artist created fail!" });
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id,[FromBody] Artist artist)
+        public async Task<ActionResult> Put(int id,[FromBody] Artist artist)
         {
-            if (_IArtist.CheckArtist(id))
+            if (await _artist.CheckArtistAsync(id))
             {
-                return (_IArtist.UpdateArtist(id,artist))?Ok(new Response { Status = "Success", Message = "Artist updated successfully!" }):BadRequest();
+                if (await _artist.UpdateArtistAsync(id,artist)){
+                    return Ok(new Response { Status = "Success", Message = "Artist updated successfully!" });
+                }
             }
-            else return BadRequest();
+            return BadRequest(new Response { Status = "Fail", Message = "Artist updated fail!" });
             
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public  async Task<ActionResult> Delete(int id)
         {
-            if (_IArtist.CheckArtist(id))
+            if (await _artist.CheckArtistAsync(id))
             {
-                return (_IArtist.DeleteArtist(id))?Ok(new Response { Status = "Success", Message = "Location deleted successfully!" }):BadRequest();
+                if(await _artist.DeleteArtistAsync(id)){
+                    return Ok(new Response { Status = "Success", Message = "Artist deleted successfully!" });
+                }
             }
-            else return BadRequest();
+            return BadRequest(new Response { Status = "Fail", Message = "Artist deleted fail!" });
         }
 
     }

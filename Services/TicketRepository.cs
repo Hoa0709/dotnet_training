@@ -10,6 +10,7 @@ namespace app.Repository
         public Task<List<Ticket>> GetListTicketAsync();
         public Task<TicketDetailDto> GetTicketDetailsAsync(int id);
         public Task<List<BookTicket>> GetListOderTicketAsync(int TicketId);
+        public Task<List<BookTicket>> GetListTakeTicketAsync(int TicketId, bool TakeTicket);
         public Task<Boolean> AddTicketAsync(TicketDto t);
         public Task<Boolean> UpdateTicketAsync(int id,Ticket t);
         public Task<Boolean> DeleteTicketAsync(int id);
@@ -154,6 +155,21 @@ namespace app.Repository
             catch
             {
                throw new Exception("Error! When Check Ticket");
+            }
+        }
+
+        public async Task<List<BookTicket>> GetListTakeTicketAsync(int TicketId, bool TakeTicket)
+        {
+            try
+            {
+                return await _context.bookTickets
+                        .Where(x => x.TicketId == TicketId && x.TakeTicket == TakeTicket)
+                        .ToListAsync();
+            }
+            catch
+            {
+                
+                throw new Exception("Error! When Get list take Ticket");
             }
         }
     }

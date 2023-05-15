@@ -10,6 +10,9 @@ namespace app.Map
             CreateMap<ProgramInfo, ProgramListViewDto>();
             CreateMap<ProgramDto, ProgramInfo>();
             CreateMap<BookTicketDto, BookTicket>();
+            CreateMap<LocationDto, Location>();
+            CreateMap<ArtistDto, Artist>();
+            CreateMap<NewsDto, News>();
             CreateMap<TicketDto, Ticket>();
             CreateMap<Ticket, TicketDetailDto>();
             // CreateMap<BookTicket, BookTicketDto>()

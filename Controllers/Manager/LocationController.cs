@@ -12,56 +12,55 @@ namespace app.Controllers
     public class LocationController : ControllerBase
     {
         
-        private readonly ILocations _ILocation;
-        public LocationController(ILocations ILocation)
+        private readonly ILocations _location;
+        public LocationController(ILocations location)
         {
-            ILocation = _ILocation;
+            _location = location;
         }
         //Get List News
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            return new JsonResult(await Task.FromResult(_ILocation.GetListLocation()));
+            return Ok(await _location.GetListLocationAsync());
         }
         //Get Item Program
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            if (await Task.FromResult(_ILocation.CheckLocation(id)))
+            if (await _location.CheckLocationAsync(id))
             {
-                var ps = await Task.FromResult(_ILocation.GetLocationDetails(id));
-                if (ps != null)
-                {
-                    return Ok(ps);
-                }
+                return Ok(await _location.GetLocationDetailsAsync(id));
             }
-            return NotFound();
+            return NotFound(new Response { Status = "Fail", Message = "Not Found Location" });
         }
         [HttpPost]
-        public IActionResult Post([FromBody] Location location)
+        public async Task<ActionResult> Post([FromBody] LocationDto location)
         {
-            return (_ILocation.AddLocation(location))?Ok(new Response { Status = "Success", Message = "Location created successfully!" }):BadRequest();
+            return (await _location.AddLocationAsync(location))?Ok(new Response { Status = "Success", Message = "Location created successfully!" }):BadRequest(new Response { Status = "Fail", Message = "Location created fail!" });
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id,[FromBody] Location location)
+        public async Task<ActionResult> Put(int id,[FromBody] Location location)
         {
-            if (_ILocation.CheckLocation(id))
+            if (await _location.CheckLocationAsync(id))
             {
-                return (_ILocation.UpdateLocation(id,location))?Ok(new Response { Status = "Success", Message = "Location updated successfully!" }):BadRequest();
+                if(await _location.UpdateLocationAsync(id,location)){
+                    return Ok(new Response { Status = "Success", Message = "Location updated successfully!" });
+                }
             }
-            else return BadRequest();
-            
+            return BadRequest(new Response { Status = "Fail", Message = "Location updated fail!" });   
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            if (_ILocation.CheckLocation(id))
+            if (await _location.CheckLocationAsync(id))
             {
-                return (_ILocation.DeleteLocation(id))?Ok(new Response { Status = "Success", Message = "Location deleted successfully!" }):BadRequest();
+                if (await _location.DeleteLocationAsync(id)){
+                    return Ok(new Response { Status = "Success", Message = "Location deleted successfully!" });
+                }
             }
-            else return BadRequest();
+            return BadRequest(new Response { Status = "Fail", Message = "Location deleted fail!" });
         }
 
     }

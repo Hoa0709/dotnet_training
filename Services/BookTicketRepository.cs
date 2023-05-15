@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Cryptography;
 using System.Text;
 using AutoMapper;
+using System.Text.Json;
 
 namespace app.Repository
 {
@@ -12,12 +13,13 @@ namespace app.Repository
     {
         public Task<List<BookTicket>> GetListBookTicketUserAsync(string UserId);
         public Task<BookTicket> GetDetailBookTicketUserAsync(int BookTicketID);
-        public Task<BookTicket> CheckOrderAsync(string code);
-        public Task<Boolean> OrderTicketUserAsync(string UserId,BookTicketDto bt);
-        public Task<Boolean> UpdateBookTicketAsync(string UserId,int BookTicketID,BookTicket bt);
-        public Task<Boolean> DeleteBookTicketAsync(string UserId,int BookTicketID);
-        public Task<Boolean> CheckBookTicketAsync(string UserId,int BookTicketID);
-        public Task<String> GetQRCodeAsync(string UserId,int BookTicketID);
+        public Task<QRCodeInfo> CheckQRCodeAsync(string code);
+        public Task<Boolean> ConfirmQRCodeAsync(string code);
+        public Task<Boolean> OrderTicketUserAsync(string UserId, BookTicketDto bt);
+        public Task<Boolean> UpdateBookTicketAsync(string UserId, int BookTicketID, BookTicket bt);
+        public Task<Boolean> DeleteBookTicketAsync(string UserId, int BookTicketID);
+        public Task<Boolean> CheckBookTicketAsync(string UserId, int BookTicketID);
+        public Task<String> GetQRCodeAsync(string UserId, int BookTicketID);
     }
     public class BookTicketRepository : IBookTicket
     {
@@ -25,13 +27,13 @@ namespace app.Repository
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public BookTicketRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, AppDbContext context,IMapper mapper)
+        public BookTicketRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, AppDbContext context, IMapper mapper)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             _mapper = mapper;
             _context = context;
-        } 
+        }
 
         public async Task<List<BookTicket>> GetListBookTicketUserAsync(string UserId)
         {
@@ -47,7 +49,7 @@ namespace app.Repository
             }
         }
 
-        public async Task<Boolean> OrderTicketUserAsync(string UserId,BookTicketDto bt)
+        public async Task<Boolean> OrderTicketUserAsync(string UserId, BookTicketDto bt)
         {
             try
             {
@@ -72,15 +74,15 @@ namespace app.Repository
             }
             catch
             {
-                throw new Exception("Error when book ticket! Let try!!!");
+                throw;// new Exception("Error when book ticket! Let try!!!");
             }
         }
 
-        public async Task<Boolean> UpdateBookTicketAsync(string UserId,int BookTicketID,BookTicket bt)
+        public async Task<Boolean> UpdateBookTicketAsync(string UserId, int BookTicketID, BookTicket bt)
         {
             try
             {
-                if (!await CheckBookTicketAsync(UserId,BookTicketID) && (bt.Id == BookTicketID))
+                if (!await CheckBookTicketAsync(UserId, BookTicketID) && (bt.Id == BookTicketID))
                 {
                     _context.Entry(bt).State = EntityState.Modified;
                     _context.SaveChanges();
@@ -90,15 +92,16 @@ namespace app.Repository
             }
             catch
             {
-                throw new Exception("Error when update book ticket! Let try!!!");
+                throw;// new Exception("Error when update book ticket! Let try!!!");
             }
         }
 
-        public async Task<Boolean> DeleteBookTicketAsync(string UserId,int BookTicketID)
+        public async Task<Boolean> DeleteBookTicketAsync(string UserId, int BookTicketID)
         {
             try
             {
-                if (!await CheckBookTicketAsync(UserId,BookTicketID)){
+                if (!await CheckBookTicketAsync(UserId, BookTicketID))
+                {
                     throw new Exception("Not Found Book Ticket in User! Please Try Again");
                 }
                 BookTicket n = _context.bookTickets
@@ -115,11 +118,12 @@ namespace app.Repository
             }
             catch
             {
-                throw new Exception("Error when delete book ticket! Let try!!!");
+                throw;// new Exception("Error when delete book ticket! Let try!!!");
             }
         }
 
-        public async Task<Boolean> CheckBookTicketAsync(string UserId,int BookTicketID){
+        public async Task<Boolean> CheckBookTicketAsync(string UserId, int BookTicketID)
+        {
             return await _context.bookTickets.AnyAsync(e => e.Id == Convert.ToInt32(BookTicketID) && e.UserId.Equals(UserId));
         }
 
@@ -141,10 +145,11 @@ namespace app.Repository
         {
             try
             {
-                return Convert.ToString( await _context.bookTickets
-                                .Where(x => x.Id == BookTicketID)
+                //string item = JsonSerializer.Serialize();
+                return await _context.bookTickets
+                                .Where(x => x.Id == BookTicketID && x.UserId == UserId)
                                 .Select(x => x.Code)
-                                .FirstOrDefaultAsync());
+                                .FirstOrDefaultAsync();;
             }
             catch
             {
@@ -152,18 +157,59 @@ namespace app.Repository
             }
         }
 
-        public async Task<BookTicket> CheckOrderAsync(string code)
+        public async Task<QRCodeInfo> CheckQRCodeAsync(string code)
         {
             try
             {
-                return await Task.FromResult(_context.bookTickets
-                                .Where(x => x.Code == code)
-                                .FirstOrDefault());
+                QRCodeInfo info = await _context.bookTickets
+                                    .Join(
+                                        _context.tickets,
+                                        bookticket => bookticket.TicketId,
+                                        ticket => ticket.Id,
+                                        (bookticket, ticket) => new { bookticket, ticket}
+                                    )
+                                    .Join(
+                                        _context.programs,
+                                        combine => combine.ticket.ProgramId,
+                                        program => program.Id,
+                                        (combine, program) => new QRCodeInfo
+                                        {
+                                            Code = combine.bookticket.Code,
+                                            EventName = program.Name,
+                                            HeldOn = program.Held_on,
+                                            FullName = combine.bookticket.FullName,
+                                            IdentityNumber = combine.bookticket.IdentityNumber,
+                                            NumberOfTickets = combine.bookticket.NumberOfTickets,
+                                            CheckIn = combine.bookticket.TakeTicket
+                                        }
+                                    )
+                                    .Where(item => item.Code == code)
+                                    .FirstOrDefaultAsync();
+                //JsonQRCode qr = JsonSerializer.Deserialize<JsonQRCode>(hc.DecodeBase64(code));
+                return info;
             }
             catch
             {
-                
                 throw new Exception("Error when check!!!");
+            }
+        }
+
+        public async Task<bool> ConfirmQRCodeAsync(string code)
+        {
+            try
+            {
+                var t = await _context.bookTickets
+                                .Where(x => x.Code == code)
+                                .FirstOrDefaultAsync();
+                if (t.TakeTicket == true) throw new Exception("Order had get ticket");
+                t.TakeTicket = true;
+                _context.Entry(t).State = EntityState.Modified;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                throw;// new Exception("Error when confirm ticket! Let try!!!");
             }
         }
     }

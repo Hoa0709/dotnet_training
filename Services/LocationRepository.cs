@@ -1,57 +1,61 @@
 using Microsoft.EntityFrameworkCore;
 using app.Connects;
 using app.Models;
+using AutoMapper;
 
 namespace app.Repository
 {
     public interface ILocations
     {
-        public List<Location> GetListLocation();
-        public Location GetLocationDetails(int id);
-        public string GetLocationName(int id);
-        public Boolean AddLocation(Location pr);
-        public Boolean UpdateLocation(int id,Location l);
-        public Boolean DeleteLocation(int id);
-        public Boolean CheckLocation(int id);
+        public Task<List<Location>> GetListLocationAsync();
+        public Task<Location> GetLocationDetailsAsync(int id);
+        public Task<Boolean> AddLocationAsync(LocationDto l);
+        public Task<Boolean> UpdateLocationAsync(int id,Location l);
+        public Task<Boolean> DeleteLocationAsync(int id);
+        public Task<Boolean> CheckLocationAsync(int id);
     }
     public class LocationRepository : ILocations
     {
         private readonly AppDbContext _context;
-        public LocationRepository( AppDbContext context)
+        private readonly IMapper _mapper;
+        public LocationRepository( AppDbContext context,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public Boolean AddLocation(Location l)
+        public async Task<Boolean> AddLocationAsync(LocationDto l)
         {
             try
             {
-                _context.locations.Add(l);
-                _context.SaveChanges();
+                Location addl = _mapper.Map<Location>(l);
+                addl.CreatAt = DateTime.Now;
+                await _context.locations.AddAsync(addl);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch
             {
-                return false;
+                throw new Exception("Error! When Add Location");
             }
         }
 
-        public bool CheckLocation(int id)
+        public async Task<Boolean> CheckLocationAsync(int id)
         {
-            return _context.locations.Any(e => e.Id == id);
+            return await _context.locations.AnyAsync(e => e.Id == id);
         }
 
-        public bool DeleteLocation(int id)
+        public async Task<Boolean> DeleteLocationAsync(int id)
         {
             try
             {
-                Location n = _context.locations
+                Location n = await _context.locations
                                     .Where(x => x.Id == id)
-                                    .FirstOrDefault();
+                                    .FirstOrDefaultAsync();
                 if (n != null)
                 {
                     _context.locations.Remove(n);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return true;
                 }
                 else
@@ -59,15 +63,15 @@ namespace app.Repository
                 }
             catch
             {
-                throw;
+                throw new Exception("Error! When Delete Location");
             }
         }
 
-        public List<Location> GetListLocation()
+        public async Task<List<Location>> GetListLocationAsync()
         {
             try
             {
-                return _context.locations.ToList();
+                return await _context.locations.ToListAsync();
             }
             catch
             {
@@ -75,57 +79,35 @@ namespace app.Repository
             }
         }
 
-        public Location GetLocationDetails(int id)
+        public async Task<Location> GetLocationDetailsAsync(int id)
         {
             try
             {
-                Location n = _context.locations
+                return await _context.locations
                                     .Where(x => x.Id == id)
-                                    .FirstOrDefault();
-                return n;
+                                    .FirstOrDefaultAsync();
             }
             catch
             {
-                throw;
+                throw new Exception("Error! When Get Location");
             }
         }
 
-        public string GetLocationName(int id)
+        public async Task<Boolean> UpdateLocationAsync(int id,Location l)
         {
             try
             {
-                Location n = _context.locations
-                                    .Where(x => x.Id == id)
-                                    .FirstOrDefault();
-                if (n != null)
+                if(id == l.Id)
                 {
-                    return n.Title;
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        public bool UpdateLocation(int id,Location l)
-        {
-            try
-            {
-                if(id != l.Id) return false;
-                else{
                     _context.Entry(l).State = EntityState.Modified;
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return true;
                 }
+                return false;
             }
             catch
             {
-                return false;
+                throw new Exception("Error! When Update location");
             }
         }
     }

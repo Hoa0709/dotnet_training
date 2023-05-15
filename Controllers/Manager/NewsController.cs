@@ -12,56 +12,54 @@ namespace app.Controllers
     public class NewsController : ControllerBase
     {
         
-        private readonly INews _Inews;
-        public NewsController(INews Inews)
+        private readonly INews _news;
+        public NewsController(INews news)
         {
-            Inews = _Inews;
+            _news = news;
         }
         //Get List News
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            return new JsonResult(await Task.FromResult(_Inews.GetListNews()));
+            return Ok(await _news.GetListNewsAsync());
         }
         //Get Item Program
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            if (await Task.FromResult(_Inews.CheckNews(id)))
+            if (await _news.CheckNewsAsync(id))
             {
-                var ps = await Task.FromResult(_Inews.GetNewsDetails(id));
-                if (ps != null)
-                {
-                    return Ok(ps);
-                }
+                return Ok(await _news.GetNewsDetailsAsync(id));
             }
-            return NotFound();
+            return NotFound(new Response { Status = "Fail", Message = "Not Found News" });
         }
         [HttpPost]
-        public IActionResult Post([FromBody] News news)
+        public async Task<ActionResult> Post([FromBody] NewsDto news)
         {
-            return (_Inews.Addnews(news))?Ok(new Response { Status = "Success", Message = "News created successfully!" }):BadRequest();
+            return (await _news.AddNewsAsync(news))?Ok(new Response { Status = "Success", Message = "News created successfully!" }):BadRequest();
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id,[FromBody] News news)
+        public async Task<ActionResult> Put(int id,[FromBody] News news)
         {
-            if (_Inews.CheckNews(id))
+            if (await _news.CheckNewsAsync(id))
             {
-                return (_Inews.UpdateNews(id,news))?Ok(new Response { Status = "Success", Message = "News updated successfully!" }):Ok(new Response { Status = "Success", Message = "Program updated fail!" });
+                if (await _news.UpdateNewsAsync(id,news)){
+                    return Ok(new Response { Status = "Success", Message = "News updated successfully!" });
+                }
             }
-            else return BadRequest();
+            return BadRequest(new Response { Status = "Success", Message = "Program updated fail!" });
             
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            if (_Inews.CheckNews(id))
+            if (await _news.CheckNewsAsync(id))
             {
-                return (_Inews.DeleteNews(id))?Ok(new Response { Status = "Success", Message = "News deleted successfully!" }):Ok(new Response { Status = "Success", Message = "Program updated fail!" });
+                if (await _news.DeleteNewsAsync(id)) return Ok(new Response { Status = "Success", Message = "News deleted successfully!" });
             }
-            else return BadRequest();
+            return BadRequest(new Response { Status = "Success", Message = "Program updated fail!" });
         }
 
     }

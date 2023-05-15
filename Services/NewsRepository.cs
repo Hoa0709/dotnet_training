@@ -1,31 +1,34 @@
 using app.Connects;
 using app.Models;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace app.Repository
 {
     public interface INews
     {
-        public List<News> GetListNews();
-        public News GetNewsDetails(int id);
-        public Boolean Addnews(News n);
-        public Boolean UpdateNews(int id,News n);
-        public Boolean DeleteNews(int id);
-        public Boolean CheckNews(int id);
+        public Task<List<News>> GetListNewsAsync();
+        public Task<News> GetNewsDetailsAsync(int id);
+        public Task<Boolean> AddNewsAsync(NewsDto n);
+        public Task<Boolean> UpdateNewsAsync(int id,News n);
+        public Task<Boolean> DeleteNewsAsync(int id);
+        public Task<Boolean> CheckNewsAsync(int id);
     }
     public class NewsRepository : INews
     {
+        private readonly IMapper _mapper;
         private readonly AppDbContext _context;
-        public NewsRepository(AppDbContext context)
+        public NewsRepository(AppDbContext context,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public List<News> GetListNews()
+        public async Task<List<News>> GetListNewsAsync()
         {
             try
             {
-                return _context.news.ToList();
+                return await _context.news.ToListAsync();
             }
             catch
             {
@@ -33,63 +36,65 @@ namespace app.Repository
             }
         }
 
-        public News GetNewsDetails(int id)
+        public async Task<News> GetNewsDetailsAsync(int id)
         {
             try
             {
-                News n = _context.news
-                                    .Where(x => x.nid == id)
-                                    .FirstOrDefault();
-                return n;
+                return await _context.news
+                            .Where(x => x.nid == id)
+                            .FirstOrDefaultAsync();
             }
             catch
             {
-                throw;
+                throw new Exception("Error! When Get News");
             }
         }
 
-        public Boolean Addnews(News n)
+        public async Task<Boolean> AddNewsAsync(NewsDto n)
         {
             try
             {
-                _context.news.Add(n);
-                _context.SaveChanges();
+                News addn = _mapper.Map<News>(n);
+                addn.postdate = DateTime.Now;
+                await _context.news.AddAsync(addn);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch
             {
-                return false;
+                throw new Exception("Error! When Add News");
             }
         }
 
-        public Boolean UpdateNews(int id,News n)
+        public async Task<Boolean> UpdateNewsAsync(int id,News n)
         {
             try
             {
-                if(id != n.nid) return false;
-                else{
+                if(id == n.nid)
+                {
                     _context.Entry(n).State = EntityState.Modified;
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return true;
                 }
+                return false;
             }
             catch
             {
-                return false;
+                throw new Exception("Error! When Update News");
             }
         }
 
-        public Boolean DeleteNews(int id)
+        public async Task<Boolean> DeleteNewsAsync(int id)
         {
             try
             {
-                News n = _context.news
+                News n = await _context.news
                                     .Where(x => x.nid == id)
-                                    .FirstOrDefault();
+                                    .FirstOrDefaultAsync();
                 if (n != null)
                 {
                     _context.news.Remove(n);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return true;
                 }
                 else
@@ -97,13 +102,13 @@ namespace app.Repository
                 }
             catch
             {
-                throw;
+                throw new Exception("Error! When Delete News");
             }
         }
 
-        public Boolean CheckNews(int id)
+        public async Task<Boolean> CheckNewsAsync(int id)
         {
-            return _context.news.Any(e => e.nid == id);
+            return await _context.news.AnyAsync(e => e.nid == id);
         }
     }
 }

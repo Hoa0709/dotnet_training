@@ -30,10 +30,10 @@ namespace app.Repository
         }
         public async Task<Boolean> SignUpAsync(RegisterModel model){
             var userExists = await userManager.FindByNameAsync(model.Username);  
-            if (userExists != null)  
+            if (userExists == null)  
                 throw new Exception("User already exists!");  
             var emailExists = await userManager.FindByEmailAsync(model.Email);  
-            if (userExists != null)  
+            if (emailExists == null)  
                 throw new Exception("Email already registed!");
             AppUser user = new AppUser()  
             {  
@@ -49,7 +49,7 @@ namespace app.Repository
         public async Task<JsonWebToken> SignInAsync(LoginModel model)
         {
             var user = await userManager.FindByNameAsync(model.Username);
-            if (user == null && await userManager.CheckPasswordAsync(user, model.Password))
+            if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
             {
                 throw new Exception("Invalid credentials.");
             }

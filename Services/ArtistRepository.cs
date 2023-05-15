@@ -1,57 +1,61 @@
 using Microsoft.EntityFrameworkCore;
 using app.Connects;
 using app.Models;
+using AutoMapper;
 
 namespace app.Repository
 {
     public interface IArtists
     {
-        public List<Artist> GetListArtist();
-        public Artist GetArtistDetails(int id);
-        public string GetArtistName(int id);
-        public Boolean AddArtist(Artist pr);
-        public Boolean UpdateArtist(int id,Artist pr);
-        public Boolean DeleteArtist(int id);
-        public Boolean CheckArtist(int id);
+        public Task<List<Artist>> GetListArtistAsync();
+        public Task<Artist> GetArtistDetailsAsync(int id);
+        public Task<Boolean> AddArtistAsync(ArtistDto a);
+        public Task<Boolean> UpdateArtistAsync(int id,Artist a);
+        public Task<Boolean> DeleteArtistAsync(int id);
+        public Task<Boolean> CheckArtistAsync(int id);
     }
     public class ArtistRepository : IArtists
     {
         private readonly AppDbContext _context;
-        public ArtistRepository( AppDbContext context)
+        private readonly IMapper _mapper;
+        public ArtistRepository( AppDbContext context,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public Boolean AddArtist(Artist l)
+        public async Task<Boolean> AddArtistAsync(ArtistDto a)
         {
             try
             {
-                _context.artists.Add(l);
-                _context.SaveChanges();
+                Artist adda = _mapper.Map<Artist>(a);
+                adda.CreatAt = DateTime.Now;
+                await _context.artists.AddAsync(adda);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch
             {
-                return false;
+                throw new Exception("Error! When Add Artist");
             }
         }
 
-        public bool CheckArtist(int id)
+        public async Task<Boolean> CheckArtistAsync(int id)
         {
-            return _context.artists.Any(e => e.Id == id);
+            return await _context.artists.AnyAsync(e => e.Id == id);
         }
 
-        public bool DeleteArtist(int id)
+        public async Task<Boolean> DeleteArtistAsync(int id)
         {
             try
             {
-                Artist n = _context.artists
+                Artist n = await _context.artists
                                     .Where(x => x.Id == id)
-                                    .FirstOrDefault();
+                                    .FirstOrDefaultAsync();
                 if (n != null)
                 {
                     _context.artists.Remove(n);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return true;
                 }
                 else
@@ -59,15 +63,15 @@ namespace app.Repository
                 }
             catch
             {
-                return false;
+                throw new Exception("Error! When Delete Artist");
             }
         }
 
-        public List<Artist> GetListArtist()
+        public Task<List<Artist>> GetListArtistAsync()
         {
             try
             {
-                return _context.artists.ToList();
+                return _context.artists.ToListAsync();
             }
             catch
             {
@@ -75,64 +79,34 @@ namespace app.Repository
             }
         }
 
-        public Artist GetArtistDetails(int id)
+        public async Task<Artist> GetArtistDetailsAsync(int id)
         {
             try
             {
-                Artist n = _context.artists
+                return await _context.artists
                                     .Where(x => x.Id == id)
-                                    .FirstOrDefault();
-                if (n != null)
-                {
-                    return n;
-                }
-                else
-                {
-                    throw new ArgumentNullException();
-                }
+                                    .FirstOrDefaultAsync();
             }
             catch
             {
-                throw;
+                throw new Exception("Error! When Get Artist");
             }
         }
-
-        public string GetArtistName(int id)
+        public async Task<Boolean> UpdateArtistAsync(int id,Artist l)
         {
             try
             {
-                Artist n = _context.artists
-                                    .Where(x => x.Id == id)
-                                    .FirstOrDefault();
-                if (n != null)
+                if(id == l.Id)
                 {
-                    return n.Name;
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        public bool UpdateArtist(int id,Artist l)
-        {
-            try
-            {
-                if(id != l.Id) return false;
-                else{
                     _context.Entry(l).State = EntityState.Modified;
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return true;
                 }
+                return false;
             }
             catch
             {
-                throw;
+                throw new Exception("Error! When Update artist");
             }
         }
     }

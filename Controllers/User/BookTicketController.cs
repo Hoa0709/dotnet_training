@@ -61,12 +61,12 @@ namespace app.Controllers
             if (await _bookTicket.CheckBookTicketAsync(userId, id))
             {
                 string code = await _bookTicket.GetQRCodeAsync(userId, id);
-                var location = new Uri($"{Request.Scheme}://{Request.Host}");
-                string url = Convert.ToString(location.AbsoluteUri);
+                //var location = new Uri($"{Request.Scheme}://{Request.Host}");
+                //string url = Convert.ToString(location.AbsoluteUri);
                 return Ok(new
                 {
                     Status = "Success",
-                    QRCode = url + "CheckTicket/" + code
+                    QRCode = code
                 });
             }
             return NotFound(new Response { Status = "Fail", Message = "Not Found Your Ticket Order" });

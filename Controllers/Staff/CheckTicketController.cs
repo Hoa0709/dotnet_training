@@ -21,12 +21,12 @@ namespace app.Controllers
             _account = account;
         }
 
-        public class QRCode
+        public class Code
         {
             public string code { get; set;}
         }
         [HttpPost("CheckQRCode")]
-        public async Task<IActionResult> Check([FromBody]QRCode code)
+        public async Task<IActionResult> Check([FromBody]Code code)
         {
             var x = await _bookTicket.CheckQRCodeAsync(code.code);
             if (x!=null)
@@ -35,7 +35,7 @@ namespace app.Controllers
                 }
             return BadRequest(new Response { Status = "Fail", Message = "Ticket not exist" });
         }
-        [HttpPost("ConfirmQRCode/{code}")]
+        [HttpPut("ConfirmQRCode/{code}")]
         public async Task<IActionResult> Confirm(string code)
         {
             if (await _bookTicket.ConfirmQRCodeAsync(code))

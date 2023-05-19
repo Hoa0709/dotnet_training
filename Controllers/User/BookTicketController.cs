@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using app.Models;
 using app.Repository;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace app.Controllers
 {
@@ -14,11 +15,13 @@ namespace app.Controllers
         private readonly ITicket _ticket;
         private readonly IBookTicket _bookTicket;
         private readonly IAccount _account;
-        public BookTicketController(ITicket ticket, IBookTicket bookTicket, IAccount account)
+        private readonly IEmailService _email;
+        public BookTicketController(ITicket ticket, IBookTicket bookTicket, IAccount account,IEmailService email)
         {
             _ticket = ticket;
             _bookTicket = bookTicket;
             _account = account;
+            _email = email;
         }
         private async Task<string> GetUserAsync() => await _account.GetUserIdAsync((string)Request.Headers["Authorization"]);
 
@@ -82,6 +85,13 @@ namespace app.Controllers
                 }
             }
             return BadRequest(new Response { Status = "Fail", Message = "Ticket had sold out or not exist" });
+        }
+
+        [HttpPost("SendEmail/{id}")]
+        public async Task<ActionResult> Send(int id)
+        {
+            await _email.SendAsync(await GetUserAsync(),id);
+            return Ok("ok");
         }
 
     }

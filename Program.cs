@@ -31,6 +31,7 @@ var builder = WebApplication.CreateBuilder(args);
     Services.AddTransient<IBookTicket,BookTicketRepository>();
     Services.AddTransient<IAccount,AccountRepository>();
     Services.AddTransient<IManagerAccount,ManagerAccountRepository>();
+    Services.AddTransient<IEmailService,EmailService>();
 
     Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     Services.AddAuthentication(options =>

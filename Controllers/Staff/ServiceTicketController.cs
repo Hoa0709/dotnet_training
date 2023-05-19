@@ -14,11 +14,13 @@ namespace app.Controllers
         private readonly ITicket _ticket;
         private readonly IBookTicket _bookTicket;
         private readonly IAccount _account;
-        public ServiceTicketController(ITicket ticket, IBookTicket bookTicket, IAccount account)
+        private readonly IEmailService _email;
+        public ServiceTicketController(ITicket ticket, IBookTicket bookTicket, IAccount account, IEmailService email)
         {
             _ticket = ticket;
             _bookTicket = bookTicket;
             _account = account;
+            _email = email;
         }
         private async Task<string> GetUserAsync() => await _account.GetUserIdAsync((string)Request.Headers["Authorization"]);
         [HttpGet]
@@ -34,6 +36,14 @@ namespace app.Controllers
                 }
             }
             return BadRequest(new Response { Status = "Fail", Message = "Ticket had sold out or not exist" });
+        }
+        [HttpPost("SendQREmail/{id}")]
+        public async Task<ActionResult> Send(int id, [FromForm] string email)
+        {
+            
+            //string x = _email.CreateQRCode("HelloWorld");
+            await _email.SendAsync(await GetUserAsync(),id,email);
+            return Ok("ok");
         }
 
     }

@@ -29,5 +29,6 @@ namespace app.Models
         public DateTime Held_on { get; set; }
 
         public int ArtistId { set; get; }
+        public int LocationId { set; get; }
     }
 }

@@ -30,10 +30,10 @@ namespace app.Repository
         }
         public async Task<Boolean> SignUpAsync(RegisterModel model){
             var userExists = await userManager.FindByNameAsync(model.Username);  
-            if (userExists == null)  
+            if (userExists != null)  
                 throw new Exception("User already exists!");  
             var emailExists = await userManager.FindByEmailAsync(model.Email);  
-            if (emailExists == null)  
+            if (emailExists != null)  
                 throw new Exception("Email already registed!");
             AppUser user = new AppUser()  
             {  
@@ -123,7 +123,6 @@ namespace app.Repository
                 throw new Exception("User creation failed! Please check user details and try again.");
             return true;
         }
-
         // private RefreshToken GetRefreshToken(string token)
         //     => _refreshTokens.SingleOrDefault(x => x.Token == token);
     }

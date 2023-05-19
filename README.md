@@ -8,6 +8,10 @@ Microsoft.EntityFrameworkCore.Design
 Microsoft.AspNetCore.Identity
 Microsoft.AspNetCore.Identity.EntityFrameworkCore -v 6.0.14
 AutoMapper.Extensions.Microsoft.DependencyInjection
+MailKit
+MimeKit
+dotnet add package Bitmap.Net --version 1.0.1
+dotnet add package QRCoder --version 1.4.1
 ######
 ######
 dotnet ef migrations add InitialCreate --context AppDbContext --output-dir Migrations/AppDbContextMigrations

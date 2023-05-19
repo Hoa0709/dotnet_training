@@ -7,7 +7,7 @@ using app.Repository;
 
 namespace app.Controllers
 {
-    [Authorize(Roles = "superadmin")]
+    [Authorize(Roles = "superadmin,admin")]
     [Route("Admin")]
     [ApiController]
     public class AdminController : ControllerBase
@@ -78,7 +78,7 @@ namespace app.Controllers
             }
             return Ok(new Response { Status = "Success", Message = "Role added for user" });
         }
-        [HttpPost("ResetPass/{id}")]
+        [HttpPut("ResetPass/{id}")]
         public async Task<IActionResult> ResetPass(string id, [FromBody] LoginModel model)
         {
             var user = await userManager.FindByIdAsync(id);

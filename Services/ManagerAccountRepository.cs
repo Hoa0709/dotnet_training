@@ -10,7 +10,6 @@ namespace app.Repository
 {
     public interface IManagerAccount
     {
-        Task<IdentityRole> CheckRoleAsync(string UserId);
         Task<List<UserRolesViewModel>> GetListUser();
     }
     public class ManagerAccountRepository : IManagerAccount
@@ -25,10 +24,6 @@ namespace app.Repository
             _configuration = configuration;
         }
 
-        public Task<IdentityRole> CheckRoleAsync(string UserId)
-        {
-            throw new NotImplementedException();
-        }
         private async Task<List<string>> GetUserRoles(AppUser user)
         {
             return new List<string>(await userManager.GetRolesAsync(user));

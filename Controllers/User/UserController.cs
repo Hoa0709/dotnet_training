@@ -10,15 +10,10 @@ namespace app.Controllers
     [ApiController]  
     public class AuthenticateController : ControllerBase
     {  
-        
-        private readonly UserManager<AppUser> userManager;  
-        private readonly RoleManager<IdentityRole> roleManager;  
         private readonly IAccount _account;  
   
-        public AuthenticateController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IAccount account)  
+        public AuthenticateController(IAccount account)  
         {  
-            this.userManager = userManager;  
-            this.roleManager = roleManager;  
             _account = account;  
         }  
         

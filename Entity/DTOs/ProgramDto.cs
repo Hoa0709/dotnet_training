@@ -8,6 +8,7 @@ namespace app.Models
         public string Pathimage_list { get; set; }
         public DateTime Held_on { get; set; }
         public int ArtistId { set; get; }
+        public int LocationId { set; get; }
     }
 
 }

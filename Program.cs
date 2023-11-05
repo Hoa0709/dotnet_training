@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using app.Connects;
-using app.Interfaces;
 using app.Models;
 using app.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,9 +20,18 @@ var builder = WebApplication.CreateBuilder(args);
         .AddDefaultTokenProviders();
 
     Services.AddControllers();
-    //add service
+    Services.AddAutoMapper(typeof(Program));
+    Services.AddControllersWithViews();
+    //Add service
     Services.AddTransient<IPrograms, ProgramRepository>();
     Services.AddTransient<ILocations, LocationRepository>();
+    Services.AddTransient<INews, NewsRepository>();
+    Services.AddTransient<IArtists, ArtistRepository>();
+    Services.AddTransient<ITicket, TicketRepository>();
+    Services.AddTransient<IBookTicket,BookTicketRepository>();
+    Services.AddTransient<IAccount,AccountRepository>();
+    Services.AddTransient<IManagerAccount,ManagerAccountRepository>();
+    Services.AddTransient<IEmailService,EmailService>();
 
     Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     Services.AddAuthentication(options =>
@@ -50,8 +58,9 @@ var app = builder.Build();
 {
     if (!app.Environment.IsDevelopment())
     {
-        app.UseExceptionHandler();
-        app.UseHsts();
+        // app.UseExceptionHandler();
+        // app.UseHsts();
+        app.UseDeveloperExceptionPage();
     }
     app.UseCors(x => x
             .AllowAnyOrigin()
@@ -59,9 +68,13 @@ var app = builder.Build();
             .AllowAnyHeader());
 
     app.UseHttpsRedirection();
+
+    app.UseMiddleware<ErrorHandlerMiddleware>();
     app.UseAuthentication();
     app.UseAuthorization();
-
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
     app.MapControllers();
 }
 
